@@ -20,8 +20,6 @@ mod reqwest_support {
     pub use self::reqwest::Client;
     pub use self::reqwest::Error;
 
-    use std::io::Read;
-
     use super::SlackWebRequestSender;
 
     impl SlackWebRequestSender for reqwest::Client {
@@ -33,8 +31,7 @@ mod reqwest_support {
             url.query_pairs_mut().extend_pairs(params);
 
             let mut response = self.get(url).send()?;
-            let mut res_str = String::new();
-            response.read_to_string(&mut res_str).map_err(reqwest::HyperError::from)?;
+            let res_str = response.text()?;
 
             Ok(res_str)
         }
@@ -50,7 +47,7 @@ mod reqwest_support {
     /// let response = slack_api::channels::list(&client, &token, &Default::default());
     /// ```
     pub fn default_client() -> Result<reqwest::Client, reqwest::Error> {
-        reqwest::Client::new()
+        Ok(reqwest::Client::new())
     }
 }
 
