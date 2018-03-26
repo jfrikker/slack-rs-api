@@ -19,8 +19,6 @@ pub fn get_slack_url_for_method(method: &str) -> String {
 mod reqwest_support {
     extern crate reqwest;
 
-    use std::io::Read;
-
     use super::{SlackWebRequestSender, get_slack_url_for_method};
 
     impl SlackWebRequestSender for reqwest::Client {
@@ -33,8 +31,7 @@ mod reqwest_support {
             url.query_pairs_mut().extend_pairs(params);
 
             let mut response = self.get(url).send()?;
-            let mut res_str = String::new();
-            response.read_to_string(&mut res_str).map_err(reqwest::HyperError::from)?;
+            let res_str = response.text()?;
 
             Ok(res_str)
         }
